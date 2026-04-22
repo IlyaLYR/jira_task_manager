@@ -1,0 +1,406 @@
+openapi: 3.0.3
+info:
+  title: Task manager
+  description: Simple task manager
+  version: 1.0.0
+
+servers:
+  - url: https://api.example.com
+
+security:
+  - BearerAuth: []
+
+paths:
+
+  /v1/auth/register:
+    post:
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required: [login, password]
+              type: object
+              properties:
+                login:
+                  type: string
+                password:
+                  type: string
+                  format: password
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  /v1/auth/token:
+    post:
+      summary: OAuth2 token endpoint
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - grant_type
+                - username
+                - password
+              properties:
+                grant_type:
+                  type: string
+                  example: password
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: OAuth2 token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+
+  /v1/tasks:
+    post:
+      summary: Create task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+
+    get:
+      summary: Get tasks list (paginated)
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/projectIdQuery'
+        - $ref: '#/components/parameters/statusQuery'
+      responses:
+        '200':
+          description: Tasks list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTasksResponse'
+
+  /v1/tasks/{taskId}:
+    get:
+      summary: Get task by id
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      responses:
+        '200':
+          description: Task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+
+    patch:
+      summary: Update task
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+
+  /v1/tasks/{taskId}/status:
+    post:
+      summary: Change task status
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  $ref: '#/components/schemas/TaskStatus'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+
+  /v1/projects:
+    post:
+      summary: Create project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required: [name]
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResponse'
+
+    get:
+      summary: Get projects list
+      responses:
+        '200':
+          description: Projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectResponse'
+
+  /v1/board:
+    get:
+      summary: Get board by project
+      parameters:
+        - $ref: '#/components/parameters/projectIdQuery'
+      responses:
+        '200':
+          description: Board
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardResponse'
+
+  /v1/board/{id}:
+    get:
+      summary: Get board by id
+      parameters:
+        - $ref: '#/components/parameters/boardIdPath'
+      responses:
+        '200':
+          description: Board
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardResponse'
+
+components:
+
+  securitySchemes:
+
+    BasicAuth:
+      type: http
+      scheme: basic
+
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+    OAuth2:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: https://api.example.com/v1/auth/token
+          scopes: {}
+
+  parameters:
+
+    taskId:
+      in: path
+      name: taskId
+      required: true
+      schema:
+        type: string
+
+    boardIdPath:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+
+    page:
+      in: query
+      name: page
+      schema:
+        type: integer
+        default: 1
+
+    limit:
+      in: query
+      name: limit
+      schema:
+        type: integer
+        default: 20
+
+    projectIdQuery:
+      in: query
+      name: projectId
+      schema:
+        type: string
+
+    statusQuery:
+      in: query
+      name: status
+      schema:
+        $ref: '#/components/schemas/TaskStatus'
+
+  schemas:
+
+    TaskStatus:
+      type: string
+      enum:
+        - TODO
+        - IN_PROGRESS
+        - REVIEW
+        - TO_TEST
+        - IN_TEST
+        - DONE
+
+    CreateTaskRequest:
+      required: [title, projectId]
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        projectId:
+          type: string
+        assigneeId:
+          type: string
+
+    UpdateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        assigneeId:
+          type: string
+
+    TaskResponse:
+      required:
+        - id
+        - number
+        - title
+        - status
+        - authorId
+        - projectId
+      type: object
+      properties:
+        id:
+          type: string
+        number:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        authorId:
+          type: string
+        assigneeId:
+          type: string
+        projectId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaginatedTasksResponse:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskResponse'
+        meta:
+          type: object
+          properties:
+            page:
+              type: integer
+            limit:
+              type: integer
+            total:
+              type: integer
+
+    ProjectResponse:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+
+    UserResponse:
+      type: object
+      required: [id, login]
+      properties:
+        id:
+          type: string
+        login:
+          type: string
+
+    AuthTokenResponse:
+      type: object
+      required:
+        - access_token
+        - token_type
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+
+    BoardResponse:
+      type: object
+      properties:
+        projectId:
+          type: string
+        columns:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/TaskResponse'
