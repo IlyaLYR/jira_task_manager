@@ -4,23 +4,12 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
-public class ProjectResponse {
-
-    @NotNull
-    private String id;
+public class ProjectsPostRequest {
 
     @NotNull
     private String name;
 
     private String description;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -42,22 +31,20 @@ public class ProjectResponse {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ProjectResponse that = (ProjectResponse) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
+        ProjectsPostRequest that = (ProjectsPostRequest) o;
+        return Objects.equals(name, that.name) &&
                 Objects.equals(description, that.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description);
+        return Objects.hash(name, description);
     }
 
     @Override
     public String toString() {
-        return "ProjectResponse{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
+        return "ProjectsPostRequest{" +
+                "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }

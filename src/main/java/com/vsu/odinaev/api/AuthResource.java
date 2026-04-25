@@ -1,6 +1,6 @@
 package com.vsu.odinaev.api;
 
-import com.vsu.odinaev.model.V1AuthRegisterPostRequest;
+import com.vsu.odinaev.model.RegisterRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
@@ -12,7 +12,7 @@ public class AuthResource {
     @Path("/auth/register")
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    public Response v1AuthRegisterPost(@Valid @NotNull V1AuthRegisterPostRequest v1AuthRegisterPostRequest) {
+    public Response v1AuthRegisterPost(@Valid RegisterRequest registerRequest) {
         return Response.ok().entity("magic!").build();
     }
 

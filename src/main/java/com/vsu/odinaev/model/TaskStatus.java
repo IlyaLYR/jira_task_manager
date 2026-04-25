@@ -20,7 +20,7 @@ public enum TaskStatus {
   
   DONE("DONE");
 
-  private String value;
+  private final String value;
 
   TaskStatus(String value) {
     this.value = value;
