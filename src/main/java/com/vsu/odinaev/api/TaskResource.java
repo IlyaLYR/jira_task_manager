@@ -1,14 +1,19 @@
 package com.vsu.odinaev.api;
 
-import com.vsu.odinaev.model.*;
+import com.vsu.odinaev.model.CreateTaskRequest;
+import com.vsu.odinaev.model.TaskStatus;
+import com.vsu.odinaev.model.TasksTaskIdStatusPostRequest;
+import com.vsu.odinaev.model.UpdateTaskRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
 
 @Path("/v1")
 public class TaskResource {
 
+    @Operation(summary = "Получить задачи (с пагинацией)")
     @GET
     @Path("/tasks")
     @Produces({"application/json"})
@@ -16,6 +21,7 @@ public class TaskResource {
         return Response.ok().entity("magic!").build();
     }
 
+    @Operation(summary = "Создать задачу")
     @POST
     @Path("/tasks")
     @Consumes({"application/json"})
@@ -24,6 +30,7 @@ public class TaskResource {
         return Response.ok().entity("magic!").build();
     }
 
+    @Operation(summary = "Получить задачу по ID")
     @GET
     @Path("/tasks/{taskId}")
     @Produces({"application/json"})
@@ -31,6 +38,7 @@ public class TaskResource {
         return Response.ok().entity("magic!").build();
     }
 
+    @Operation(summary = "Обновить задачу по ID")
     @PATCH
     @Path("/tasks/{taskId}")
     @Consumes({"application/json"})
@@ -39,6 +47,7 @@ public class TaskResource {
         return Response.ok().entity("magic!").build();
     }
 
+    @Operation(summary = "Сменить статус задачи")
     @POST
     @Path("/tasks/{taskId}/status")
     @Consumes({"application/json"})

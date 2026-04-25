@@ -2,12 +2,13 @@ package com.vsu.odinaev.api;
 
 import com.vsu.odinaev.model.RegisterRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
 
 @Path("/v1")
 public class AuthResource {
+    @Operation(summary = "Регистрация пользователя")
     @POST
     @Path("/auth/register")
     @Consumes({"application/json"})
@@ -16,6 +17,7 @@ public class AuthResource {
         return Response.ok().entity("magic!").build();
     }
 
+    @Operation(summary = "OAuth2 token endpoint")
     @POST
     @Path("/auth/token")
     @Consumes({"application/x-www-form-urlencoded"})

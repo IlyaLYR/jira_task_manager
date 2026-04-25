@@ -2,10 +2,12 @@ package com.vsu.odinaev.api;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
 
 @Path("/v1")
 public class BoardResource {
 
+    @Operation(summary = "Получить доску по проекту (ID)")
     @GET
     @Path("/board")
     @Produces({"application/json"})
@@ -13,6 +15,7 @@ public class BoardResource {
         return Response.ok().entity("magic!").build();
     }
 
+    @Operation(summary = "Получить доску по ID")
     @GET
     @Path("/board/{id}")
     @Produces({"application/json"})
