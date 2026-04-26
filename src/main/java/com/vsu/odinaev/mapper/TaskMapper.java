@@ -63,14 +63,21 @@ public interface TaskMapper {
         return value == null ? null : value.toInstant();
     }
 
+    @Mapping(target = "removeItemsItem", ignore = true)
     @Mapping(target = "items", source = "tasks")
-    @Mapping(target = "meta.page", source = "page")
-    @Mapping(target = "meta.limit", source = "limit")
-    @Mapping(target = "meta.total", source = "total")
+    @Mapping(target = "meta", expression = "java(createMeta(page, limit, total))")
     PaginatedTasksResponse toResponse(
             List<Task> tasks,
             int page,
             int limit,
             long total
     );
+
+    default PaginatedTasksResponse.Meta createMeta(int page, int limit, long total) {
+        PaginatedTasksResponse.Meta meta = new PaginatedTasksResponse.Meta();
+        meta.setPage(page);
+        meta.setLimit(limit);
+        meta.setTotal(total);
+        return meta;
+    }
 }

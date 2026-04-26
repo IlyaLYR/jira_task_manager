@@ -72,31 +72,31 @@ public class PaginatedTasksResponse {
 
     // Вложенный класс Meta (можно вынести отдельно, но для целостности оставим здесь)
     public static class Meta {
-        private Integer page;
-        private Integer limit;
-        private Integer total;
+        private int page;
+        private int limit;
+        private long total;
 
-        public Integer getPage() {
+        public int getPage() {
             return page;
         }
 
-        public void setPage(Integer page) {
+        public void setPage(int page) {
             this.page = page;
         }
 
-        public Integer getLimit() {
+        public int getLimit() {
             return limit;
         }
 
-        public void setLimit(Integer limit) {
+        public void setLimit(int limit) {
             this.limit = limit;
         }
 
-        public Integer getTotal() {
+        public long getTotal() {
             return total;
         }
 
-        public void setTotal(Integer total) {
+        public void setTotal(long total) {
             this.total = total;
         }
 
