@@ -4,20 +4,50 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Gets or Sets TaskStatus
+ * Перечисление статусов задачи.
+ *
+ * <p>Описывает жизненный цикл задачи на Kanban-доске. Переходы между
+ * статусами выполняются через эндпоинт {@code POST /v1/tasks/{taskId}/status}.</p>
+ *
+ * <ul>
+ *   <li>{@link #TODO}        — задача создана, ещё не взята в работу</li>
+ *   <li>{@link #IN_PROGRESS} — задача выполняется</li>
+ *   <li>{@link #REVIEW}      — задача на проверке кода</li>
+ *   <li>{@link #TO_TEST}     — задача ожидает тестирования</li>
+ *   <li>{@link #IN_TEST}     — задача тестируется</li>
+ *   <li>{@link #DONE}        — задача завершена</li>
+ * </ul>
  */
 public enum TaskStatus {
 
+    /**
+     * Задача создана, ещё не взята в работу.
+     */
     TODO("TODO"),
 
+    /**
+     * Задача находится в работе у исполнителя.
+     */
     IN_PROGRESS("IN_PROGRESS"),
 
+    /**
+     * Задача передана на ревью кода.
+     */
     REVIEW("REVIEW"),
 
+    /**
+     * Задача ожидает тестирования.
+     */
     TO_TEST("TO_TEST"),
 
+    /**
+     * Задача находится на тестировании.
+     */
     IN_TEST("IN_TEST"),
 
+    /**
+     * Задача выполнена и закрыта.
+     */
     DONE("DONE");
 
     private final String value;

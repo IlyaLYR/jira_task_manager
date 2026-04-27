@@ -4,11 +4,23 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
+/**
+ * DTO пользователя для ответов API.
+ *
+ * <p>Возвращается эндпоинтом {@code POST /v1/auth/register}.
+ * Хэш пароля в ответ не включается.</p>
+ */
 public class UserResponse {
 
+    /**
+     * Уникальный идентификатор пользователя (UUID в виде строки).
+     */
     @NotNull
     private String id;
 
+    /**
+     * Логин пользователя.
+     */
     @NotNull
     private String login;
 

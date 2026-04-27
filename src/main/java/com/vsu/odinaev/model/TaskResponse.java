@@ -5,32 +5,72 @@ import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
+/**
+ * DTO задачи для ответов API.
+ *
+ * <p>Возвращается эндпоинтами {@code GET /v1/tasks}, {@code POST /v1/tasks},
+ * {@code GET /v1/tasks/{taskId}}, {@code PATCH /v1/tasks/{taskId}} и
+ * {@code POST /v1/tasks/{taskId}/status}.</p>
+ *
+ * <p>Вложенные сущности (автор, исполнитель, проект) представлены только
+ * своими идентификаторами для уменьшения объёма ответа.</p>
+ */
 public class TaskResponse {
 
+    /**
+     * Уникальный идентификатор задачи (UUID в виде строки).
+     */
     @NotNull
     private String id;
 
+    /**
+     * Порядковый номер задачи в проекте.
+     */
     @NotNull
     private String number;
 
+    /**
+     * Заголовок задачи.
+     */
     @NotNull
     private String title;
 
+    /**
+     * Подробное описание задачи. Может быть {@code null}.
+     */
     private String description;
 
+    /**
+     * Текущий статус задачи.
+     */
     @NotNull
     private TaskStatus status;
 
+    /**
+     * UUID пользователя, создавшего задачу.
+     */
     @NotNull
     private String authorId;
 
+    /**
+     * UUID исполнителя задачи. Может быть {@code null}, если не назначен.
+     */
     private String assigneeId;
 
+    /**
+     * UUID проекта, которому принадлежит задача.
+     */
     @NotNull
     private String projectId;
 
+    /**
+     * Дата и время создания задачи (UTC).
+     */
     private OffsetDateTime createdAt;
 
+    /**
+     * Дата и время последнего обновления задачи (UTC).
+     */
     private OffsetDateTime updatedAt;
 
     public String getId() {

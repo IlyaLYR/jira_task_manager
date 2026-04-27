@@ -4,11 +4,22 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
+/**
+ * Тело запроса для создания нового проекта.
+ *
+ * <p>Используется в эндпоинте {@code POST /v1/projects}.</p>
+ */
 public class ProjectsPostRequest {
 
+    /**
+     * Название нового проекта. Обязательное поле.
+     */
     @NotNull
     private String name;
 
+    /**
+     * Описание проекта. Необязательное поле.
+     */
     private String description;
 
     public String getName() {

@@ -5,16 +5,31 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
+/**
+ * DTO ответа при успешной аутентификации.
+ *
+ * <p>Возвращается эндпоинтом {@code POST /v1/auth/token}. Содержит JWT-токен,
+ * тип токена и время жизни в секундах.</p>
+ */
 public class AuthTokenResponse {
 
+    /**
+     * JWT access-токен для авторизации запросов. Передаётся в заголовке {@code Authorization: Bearer <token>}.
+     */
     @JsonProperty("access_token")
     @NotNull
     private String accessToken;
 
+    /**
+     * Тип токена. Всегда {@code "Bearer"}.
+     */
     @JsonProperty("token_type")
     @NotNull
     private String tokenType;
 
+    /**
+     * Время жизни токена в секундах (обычно 3600).
+     */
     @JsonProperty("expires_in")
     private Integer expiresIn;
 

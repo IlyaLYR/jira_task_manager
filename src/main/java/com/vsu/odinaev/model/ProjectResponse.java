@@ -4,14 +4,28 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
+/**
+ * DTO проекта для ответов API.
+ *
+ * <p>Возвращается эндпоинтами {@code GET /v1/projects} и {@code POST /v1/projects}.</p>
+ */
 public class ProjectResponse {
 
+    /**
+     * Уникальный идентификатор проекта (UUID в виде строки).
+     */
     @NotNull
     private String id;
 
+    /**
+     * Название проекта.
+     */
     @NotNull
     private String name;
 
+    /**
+     * Описание проекта. Может быть {@code null}.
+     */
     private String description;
 
     public String getId() {

@@ -7,11 +7,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Постраничный ответ со списком задач.
+ *
+ * <p>Возвращается эндпоинтом {@code GET /v1/tasks}. Содержит задачи текущей
+ * страницы ({@code items}) и метаданные пагинации ({@code meta}).</p>
+ */
 public class PaginatedTasksResponse {
 
+    /**
+     * Список задач на текущей странице.
+     */
     @NotNull
     private List<@Valid TaskResponse> items = new ArrayList<>();
 
+    /**
+     * Метаданные пагинации (номер страницы, размер, общее количество).
+     */
     @NotNull
     private Meta meta;
 
@@ -70,10 +82,21 @@ public class PaginatedTasksResponse {
                 '}';
     }
 
-    // Вложенный класс Meta (можно вынести отдельно, но для целостности оставим здесь)
+    /**
+     * Метаданные пагинации: текущая страница, размер страницы и общее количество записей.
+     */
     public static class Meta {
+        /**
+         * Номер текущей страницы (начиная с 1).
+         */
         private int page;
+        /**
+         * Максимальное количество элементов на странице.
+         */
         private int limit;
+        /**
+         * Общее количество записей, соответствующих фильтру.
+         */
         private long total;
 
         public int getPage() {

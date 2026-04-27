@@ -5,11 +5,23 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
+/**
+ * Тело запроса для регистрации нового пользователя.
+ *
+ * <p>Используется в эндпоинте {@code POST /v1/auth/register}.</p>
+ */
 public class RegisterRequest {
 
+    /**
+     * Логин нового пользователя. Обязательное поле, должен быть уникальным.
+     */
     @NotNull
     private String login;
 
+    /**
+     * Пароль в открытом виде. Обязательное поле.
+     * Не включается в JSON-ответы (аннотация {@code WRITE_ONLY}).
+     */
     @NotNull
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)   // не возвращается в JSON
     private String password;

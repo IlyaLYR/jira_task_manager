@@ -4,16 +4,34 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
+/**
+ * Тело запроса для создания новой задачи.
+ *
+ * <p>Используется в эндпоинте {@code POST /v1/tasks}.
+ * Автором задачи автоматически становится текущий аутентифицированный пользователь.</p>
+ */
 public class CreateTaskRequest {
 
+    /**
+     * Заголовок задачи. Обязательное поле.
+     */
     @NotNull
     private String title;
 
+    /**
+     * Подробное описание задачи. Необязательное поле.
+     */
     private String description;
 
+    /**
+     * UUID проекта, в котором создаётся задача. Обязательное поле.
+     */
     @NotNull
     private String projectId;
 
+    /**
+     * UUID пользователя-исполнителя. Необязательное поле.
+     */
     private String assigneeId;
 
     // Геттеры и сеттеры (без аннотаций, @NotNull уже на полях)

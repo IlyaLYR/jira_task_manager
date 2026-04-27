@@ -7,10 +7,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * DTO доски задач для ответов API.
+ *
+ * <p>Возвращается эндпоинтами {@code GET /v1/board} и {@code GET /v1/board/{id}}.
+ * Задачи сгруппированы по статусам — каждая колонка соответствует одному статусу
+ * из {@link TaskStatus}.</p>
+ */
 public class BoardResponse {
 
+    /**
+     * UUID проекта, которому принадлежит доска.
+     */
     private String projectId;
 
+    /**
+     * Колонки доски: ключ — имя статуса (например, {@code "TODO"}, {@code "IN_PROGRESS"}),
+     * значение — список задач с данным статусом.
+     */
     private Map<String, List<@Valid TaskResponse>> columns = new HashMap<>();
 
     public String getProjectId() {
