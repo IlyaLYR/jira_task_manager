@@ -14,5 +14,6 @@ else
     echo "✓ Keys already exist."
 fi
 
+source .env
 docker-compose up -d
 ./gradlew quarkusDev

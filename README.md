@@ -1,80 +1,223 @@
-# jira
+# Jira API
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+REST API для управления задачами в стиле Jira. Построен на Quarkus (Java 21) с использованием JAX-RS, Hibernate ORM с Panache, MapStruct и PostgreSQL. Аутентификация — JWT.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+## Технологии
 
-## Running the application in dev mode
+- **Java 21**, **Quarkus 3.x**
+- **JAX-RS** (RESTEasy) — REST-контроллеры
+- **Hibernate ORM + Panache** — работа с БД (active record)
+- **MapStruct** — маппинг entity ↔ DTO
+- **SmallRye JWT** — аутентификация по JWT токенам
+- **PostgreSQL** — база данных
 
-You can run your application in dev mode that enables live coding using:
+---
 
-```shell script
-./gradlew quarkusDev
+## Предварительные требования
+
+- **Java 21+**
+- **Docker** и **Docker Compose** (для PostgreSQL)
+- Gradle Wrapper включён — отдельная установка Gradle не нужна
+
+---
+
+## Быстрый старт
+
+```shell
+./start.sh
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+Приложение доступно по адресу: `http://localhost:8080`
 
-## Packaging and running the application
+---
 
-The application can be packaged using:
+## Seed-данные (тестовый пользователь)
 
-```shell script
-./gradlew build
+При старте в dev-режиме база данных пересоздаётся и заполняется:
+
+| Поле     | Значение                                   |
+|----------|--------------------------------------------|
+| login    | `testuser`                                 |
+| password | `password`                                 |
+| projectId | `b0000000-0000-0000-0000-000000000001`    |
+
+---
+
+## Тестирование через Swagger UI
+
+### Шаг 1. Открыть Swagger UI
+
+Перейти по адресу: **http://localhost:8080/q/swagger-ui/**
+
+---
+
+### Шаг 2. Зарегистрировать пользователя (или использовать тестового)
+
+> Можно пропустить, если используете `testuser` / `password`.
+
+Найти эндпоинт **POST /v1/auth/register**, нажать **Try it out**, ввести тело запроса:
+
+```json
+{
+  "login": "myuser",
+  "password": "mypassword"
+}
 ```
 
-It produces the `quarkus-run.jar` file in the `build/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `build/quarkus-app/lib/` directory.
+Нажать **Execute**. Ожидаемый ответ: `201 Created`.
 
-The application is now runnable using `java -jar build/quarkus-app/quarkus-run.jar`.
+---
 
-If you want to build an _über-jar_, execute the following command:
+### Шаг 3. Получить JWT токен
 
-```shell script
-./gradlew build -Dquarkus.package.jar.type=uber-jar
+Найти эндпоинт **POST /v1/auth/token**, нажать **Try it out**.
+
+Заполнить форму:
+
+| Поле         | Значение   |
+|--------------|------------|
+| `grant_type` | `password` |
+| `username`   | `testuser` |
+| `password`   | `password` |
+
+Нажать **Execute**. В ответе скопировать значение поля `access_token`:
+
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar build/*-runner.jar`.
+---
 
-## Creating a native executable
+### Шаг 4. Авторизоваться в Swagger UI
 
-You can create a native executable using:
+1. Нажать кнопку **Authorize** (замок) в правом верхнем углу страницы.
+2. В поле **BearerAuth (http, Bearer)** вставить скопированный токен **без префикса `Bearer `** — только сам токен:
+   ```
+   eyJhbGciOiJSUzI1NiJ9...
+   ```
+3. Нажать **Authorize**, затем **Close**.
 
-```shell script
-./gradlew build -Dquarkus.native.enabled=true
+Теперь все последующие запросы будут автоматически передавать заголовок `Authorization: Bearer <token>`.
+
+---
+
+### Шаг 5. Тестировать эндпоинты
+
+#### Проекты
+
+**Получить список проектов** — GET /v1/projects
+
+Нажать **Try it out** → **Execute**. Вернёт все проекты, включая seed-проект.
+
+**Создать проект** — POST /v1/projects
+
+```json
+{
+  "name": "My Project",
+  "description": "Project description"
+}
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+Сохранить `id` созданного проекта для дальнейших запросов.
 
-```shell script
-./gradlew build -Dquarkus.native.enabled=true -Dquarkus.native.container-build=true
+---
+
+#### Задачи
+
+**Создать задачу** — POST /v1/tasks
+
+```json
+{
+  "title": "First task",
+  "description": "Task description",
+  "projectId": "b0000000-0000-0000-0000-000000000001"
+}
 ```
 
-You can then execute your native executable with: `./build/jira-1.0-SNAPSHOT-runner`
+Сохранить `id` задачи из ответа.
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/gradle-tooling>.
+**Получить список задач** — GET /v1/tasks
 
-## Related Guides
+Доступные query-параметры:
+- `page` — номер страницы (по умолчанию 1)
+- `limit` — размер страницы (по умолчанию 20)
+- `projectId` — фильтр по проекту
+- `status` — фильтр по статусу (`TODO`, `IN_PROGRESS`, `REVIEW`, `TO_TEST`, `IN_TEST`, `DONE`)
 
-- Hibernate Validator ([guide](https://quarkus.io/guides/validation)): Validate object properties (field, getter) and
-  method parameters for your beans (REST, CDI, Jakarta Persistence)
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes
-  with Swagger UI
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code
-  for Hibernate ORM via the active record or the repository pattern
-- JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
+**Получить задачу по ID** — GET /v1/tasks/{taskId}
 
-## Provided Code
+**Обновить задачу (частично)** — PATCH /v1/tasks/{taskId}
 
-### Hibernate ORM
+```json
+{
+  "title": "Updated title"
+}
+```
 
-Create your first JPA entity
+Поля `title`, `description`, `assigneeId` — все опциональны.
 
-[Related guide section...](https://quarkus.io/guides/hibernate-orm)
+**Изменить статус задачи** — POST /v1/tasks/{taskId}/status
 
-[Related Hibernate with Panache section...](https://quarkus.io/guides/hibernate-orm-panache)
+```json
+{
+  "status": "IN_PROGRESS"
+}
+```
 
-### RESTEasy JAX-RS
+Допустимые статусы: `TODO` → `IN_PROGRESS` → `REVIEW` → `TO_TEST` → `IN_TEST` → `DONE`
 
-Easily start your RESTful Web Services
+---
 
-[Related guide section...](https://quarkus.io/guides/getting-started#the-jax-rs-resources)
+#### Доска (Kanban)
+
+**Получить доску по projectId** — GET /v1/board?projectId={id}
+
+Вернёт все задачи проекта, сгруппированные по статусам:
+
+```json
+{
+  "projectId": "b0000000-0000-0000-0000-000000000001",
+  "columns": {
+    "TODO": [...],
+    "IN_PROGRESS": [...],
+    "REVIEW": [...],
+    "TO_TEST": [...],
+    "IN_TEST": [...],
+    "DONE": [...]
+  }
+}
+```
+
+**Получить доску по ID проекта** — GET /v1/board/{id}
+
+Альтернативный способ с path-параметром вместо query.
+
+---
+
+## Справочник эндпоинтов
+
+| Метод  | Путь                        | Описание                            | Auth |
+|--------|-----------------------------|-------------------------------------|------|
+| POST   | /v1/auth/register           | Регистрация пользователя            | Нет  |
+| POST   | /v1/auth/token              | Получить JWT токен                  | Нет  |
+| GET    | /v1/projects                | Список проектов                     | Да   |
+| POST   | /v1/projects                | Создать проект                      | Да   |
+| GET    | /v1/tasks                   | Список задач (пагинация, фильтры)   | Да   |
+| POST   | /v1/tasks                   | Создать задачу                      | Да   |
+| GET    | /v1/tasks/{taskId}          | Получить задачу по ID               | Да   |
+| PATCH  | /v1/tasks/{taskId}          | Обновить задачу (частично)          | Да   |
+| POST   | /v1/tasks/{taskId}/status   | Изменить статус задачи              | Да   |
+| GET    | /v1/board                   | Доска по projectId (query param)    | Да   |
+| GET    | /v1/board/{id}              | Доска по ID проекта (path param)    | Да   |
+
+---
+
+## Полезные ссылки
+
+- Swagger UI: http://localhost:8080/q/swagger-ui/
+- OpenAPI спецификация: http://localhost:8080/openapi
+- Dev UI: http://localhost:8080/q/dev/
