@@ -1,6 +1,18 @@
--- This file allow to write SQL commands that will be emitted in test and dev.
--- The commands are commented as their support depends of the database
--- insert into myentity (id, field) values(1, 'field-1');
--- insert into myentity (id, field) values(2, 'field-2');
--- insert into myentity (id, field) values(3, 'field-3');
--- alter sequence myentity_seq restart with 4;
+-- Тестовый пользователь: login=testuser, password=password
+INSERT INTO users (id, login, password_hash, created_at, updated_at)
+VALUES (
+    'a0000000-0000-0000-0000-000000000001',
+    'testuser',
+    '$2a$10$a99EY7yN463XON/HlpPxD.rG9qT6bjOMY8MuSBkkrNrxzsshdHXJy',
+    now(), now()
+);
+
+-- Тестовый проект
+INSERT INTO projects (id, name, description, owner_id, created_at, updated_at)
+VALUES (
+    'b0000000-0000-0000-0000-000000000001',
+    'Test Project',
+    'Seed project for dev testing',
+    'a0000000-0000-0000-0000-000000000001',
+    now(), now()
+);
