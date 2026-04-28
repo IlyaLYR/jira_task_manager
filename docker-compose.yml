@@ -10,6 +10,31 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - keys_data:/keys
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      QUARKUS_PROFILE: dev
+      MP_JWT_VERIFY_PUBLICKEY_LOCATION: /keys/publicKey.pem
+      SMALLRYE_JWT_SIGN_KEY_LOCATION: /keys/privateKey.pem
 
 volumes:
   postgres_data:
+  keys_data:
