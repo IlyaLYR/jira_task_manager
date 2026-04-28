@@ -14,6 +14,7 @@ paths:
 
   /v1/auth/register:
     post:
+      security: []
       summary: Register user
       requestBody:
         required: true
@@ -38,6 +39,7 @@ paths:
 
   /v1/auth/token:
     post:
+      security: []
       summary: OAuth2 token endpoint
       requestBody:
         required: true
